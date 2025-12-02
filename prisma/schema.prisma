@@ -10,5 +10,91 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  patronymic String?
+  birthday DateTime?
+  phoneNumber String?
+  email String @unique
+  password String
+  orders Order[]
+  addresses Address[]
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  city String
+  street String
+  houseNumber Int
+  apartamentNumber Int
+  entranceNumber Int
+  user User? @relation(fields: [userId], references: [id])
+  userId Int?
+  order Order? @relation(fields: [orderId], references: [id])
+  orderId Int? @unique
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  firstName String
+  lastName  String
+  patronymic String
+  birthday DateTime
+  phoneNumber String
+  email String
+  address Address?
+  user User? @relation(fields: [userId], references: [id])
+  userId Int?
+  status String @default("done to build")
+  totalPrice Int
+  discountPrice Int
+  typePay String
+  productOnOrder ProductOnOrder[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  previewPhoto  String
+  description  String
+  price Int
+  discount Int
+  totalStorage Int
+
+  blocksInfo BlockInfo[]
+  productOnOrder ProductOnOrder[]
+}
+
+model ProductOnOrder {
+  product Product @relation(fields: [productId], references: [id])
+  productId Int
+  order Order @relation(fields: [orderId], references: [id])
+  orderId Int
+  ordered Int 
+  @@id([productId, orderId])
+}
+model BlockInfo {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  typeView String
+  priorityView Int
+  media String
+
+  product Product @relation(fields: [productId], references: [id])
+  productId Int
+  params ParametersInfo[]
+}
+model ParametersInfo {
+  id Int @id @default(autoincrement())
+  name String
+  parameter String
+  blockInfo BlockInfo @relation(fields: [blockInfoId], references: [id])
+  blockInfoId Int
 }
