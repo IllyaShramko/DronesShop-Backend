@@ -67,6 +67,8 @@ model Product {
   discount     Int
   totalStorage Int
 
+  category   Category          @relation(fields: [categoryId], references: [id])
+  categoryId Int
   blocksInfo     BlockInfo[]
   productOnOrder ProductOnOrder[]
 }
@@ -100,4 +102,11 @@ model ParametersInfo {
   parameter   String
   blockInfo   BlockInfo @relation(fields: [blockInfoId], references: [id])
   blockInfoId Int
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  icon        String
+  products    Product[]
 }

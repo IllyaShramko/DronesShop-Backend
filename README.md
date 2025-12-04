@@ -43,7 +43,7 @@ ____
                 "description": "description",
                 "price": 123123,
                 "discount": 0,
-                "totalStorage", 5
+                "totalStorage": 5
             }
         ]
         ```
@@ -60,8 +60,39 @@ ____
             "description": "description",
             "price": 123123,
             "discount": 0,
-            "totalStorage", 5
+            "totalStorage": 5,
+            "category": {
+                "id": 10,
+                "name": "Some title",
+                "icon": "Some desc"
+            },
+            "blocksInfo": [
+                {
+                    "id": 10,
+                    "title": "Some title",
+                    "description": "Some desc",
+                    "typeView": "some",
+                    "priorityView": 1,
+                    "media": "image.png",
+                    "productId": 1,
+                    "params": [
+                        {
+                            "id": 1,
+                            "key": "Weight",
+                            "value": "200g",
+                            "blockInfoId": 10
+                        },
+                        {
+                            "id": 2,
+                            "key": "Color",
+                            "value": "Black",
+                            "blockInfoId": 10
+                        }
+                    ]
+                }
+            ]
         }
+
         ```
     - **400** - Некоректний запит. ID Не є числом або не було знайдено.
     - **404** - Товар не знайдено. Тобто товару з таким ID не існує.
@@ -84,7 +115,7 @@ ____
                 "description": "Mdescription",
                 "price": 1231123123,
                 "discount": 10,
-                "totalStorage", 15
+                "totalStorage": 15
         }
         ```
     - **400** - Передано неправильний формат даних.
@@ -101,7 +132,7 @@ ____
                 "description": "description",
                 "price": 123123,
                 "discount": 0,
-                "totalStorage", 5
+                "totalStorage": 5
         }
         ```
         
