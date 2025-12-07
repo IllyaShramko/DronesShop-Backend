@@ -1,12 +1,16 @@
 {
   "dependencies": {
+    "@prisma/client": "^6.19.0",
     "express": "^5.1.0",
     "prisma": "^6.19.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "ts-node ./src/server.ts"
+    "start": "ts-node ./src/server.ts",
+    "init-db": "prisma migrate dev --name init",
+    "format-db": "prisma format",
+    "seed": "ts-node ./src/seed/category.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.5"
