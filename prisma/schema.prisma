@@ -51,7 +51,7 @@ model Order {
   address        Address?
   user           User?            @relation(fields: [userId], references: [id])
   userId         Int?
-  status         String           @default("done to build")
+  status         String           @default("Оформлено")
   totalPrice     Int
   discountPrice  Int
   typePay        String
