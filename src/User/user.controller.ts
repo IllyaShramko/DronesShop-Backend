@@ -76,4 +76,47 @@ export const UserController: UserControllerContract = {
             res.status(500).json({message: 'server error'})
         }
     },
+    forgotPassword: async(req, res) => {
+        try {
+            const {email, newPassword} = req.body
+            await UserService.forgotPassword(email, newPassword)
+            res.status(200).json({message: "Password updated successfully"})
+        } catch (error) {
+            console.log({message: "User not found"})
+            res.status(500).json({message: 'User not found'})
+        }
+    },
+    getAdresses: async(req, res) => {
+        try {
+            const addresses = await UserService.getAdresses(res.locals.userId)
+            res.status(200).json(addresses)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message: 'server error'})
+        }
+    },
+    createAddress: async(req, res) => {
+        try {
+            const addressData = {...req.body, userId: res.locals.userId}
+            const address = await UserService.createAddress(addressData)
+            res.status(200).json(address)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message: 'server error'})
+        }
+    },
+    editAddress: async(req, res) => {
+        const addressId = +req.params.id
+        if (isNaN(addressId)){
+            res.status(400).json({message: 'address id must be a number'})
+            return
+        }
+        try {
+            const address = await UserService.editAddress(addressId, req.body)
+            res.status(200).json(address)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message: 'server error'})
+        }
+    }
 }

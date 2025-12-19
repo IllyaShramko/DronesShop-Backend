@@ -29,5 +29,28 @@ export const UserRepository: UserRepositoryContract = {
             omit: {password: true}
         })
         return updatedUser
+    },
+    async forgotPassword(email, newPassword){
+        await Client.user.update({
+            where: {email},
+            data: {password: newPassword}
+        })
+    },
+    async getAdressesByUserId(userId){
+        const addresses = await Client.address.findMany({
+            where: {userId}
+        })
+        return addresses
+    },
+    async createAddress(data){
+        const address = await Client.address.create({data})
+        return address
+    },
+    async editAddress(id, data){
+        const address = await Client.address.update({
+            where: {id},
+            data
+        })
+        return address
     }
 }

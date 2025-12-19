@@ -46,5 +46,21 @@ export const UserService: UserServiceContract = {
     async editInformation(id, data){
         const updatedUser = await UserRepository.editInformation(id, data)
         return updatedUser
+    },
+    async forgotPassword(email, newPassword){
+        const hashedPassword = await hash(newPassword, 10)
+        await UserRepository.forgotPassword(email, hashedPassword)
+    },
+    async getAdresses(userId){
+        const addresses = await UserRepository.getAdressesByUserId(userId)
+        return addresses
+    },
+    async createAddress(data){
+        const address = await UserRepository.createAddress(data)
+        return address
+    },
+    async editAddress(id, data){
+        const address = await UserRepository.editAddress(id, data)
+        return address
     }
 }
