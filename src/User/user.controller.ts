@@ -76,16 +76,6 @@ export const UserController: UserControllerContract = {
             res.status(500).json({message: 'server error'})
         }
     },
-    forgotPassword: async(req, res) => {
-        try {
-            const {email, newPassword} = req.body
-            await UserService.forgotPassword(email, newPassword)
-            res.status(200).json({message: "Password updated successfully"})
-        } catch (error) {
-            console.log({message: "User not found"})
-            res.status(500).json({message: 'User not found'})
-        }
-    },
     getAdresses: async(req, res) => {
         try {
             const addresses = await UserService.getAdresses(res.locals.userId)
