@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 
 export type Order = Prisma.OrderGetPayload<{}>
 
+
 export type CreateOrder = Prisma.OrderUncheckedCreateInput
 
 
