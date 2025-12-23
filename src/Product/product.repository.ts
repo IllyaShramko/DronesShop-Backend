@@ -1,5 +1,5 @@
 import { ProductRepositoryContract } from "./product.types";
-import { PrismaClient as PC } from "../generated/prisma/client"; 
+import { PrismaClient as PC, Prisma } from "../generated/prisma"; 
 
 const PrismaClient = new PC()
 

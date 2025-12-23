@@ -2,19 +2,10 @@ import { PrismaClient as PC } from "../generated/prisma/client";
 
 const PrismaClient = new PC()
 
-async function createCategory() {
-    return await PrismaClient.category.create({
-        data: {
-            name: "category2",
-            icon: "1312"
-        }
-    })
-}
-
 async function createBlock() {
     return await PrismaClient.blockInfo.create({
         data: {
-            title: "ПОутжнczxcvxczий",
+            title: "ПОутжнczxcvxcvvvbnvxxccbzий",
             description: "cxazxcvckvaokvpovadv dkvoasdv odsvasdvadsvava adapivdf",
             typeView: "v2",
             priorityView: 1,
@@ -28,12 +19,11 @@ async function createBlock() {
 async function createParam() {
     return await PrismaClient.parametersInfo.create({
         data: {
-            name: "categoryxvxcv2",
-            parameter: "131xxx2",
-            blockInfoId: 3
+            name: "Номінальна потужність",
+            parameter: "1500 Вт",
+            blockInfoId: 2
         }
     })
 }
 
 createParam()
-

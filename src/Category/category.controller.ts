@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import { ProductService } from "./product.service"
-import { ProductControllerContract } from "./product.types"
+import { CategoryService } from "./category.service"
+import { Category, CategoryControllerContract, CreateCategory, UpdateCategoryChecked } from "./category.types"
 
-export const ProductController: ProductControllerContract = {
+export const CategoryWithProducts: CategoryControllerContract = {
     getAll: async (req, res) => {
         let categoryId: any = req.query.categoryId
         if (categoryId) {
@@ -12,29 +12,28 @@ export const ProductController: ProductControllerContract = {
                 return
             }
         }
-        ProductService.getAll(categoryId).then((products) => {
-            res.status(200).json(products)
-        })
+        const categories = await CategoryService.getAll()
+        res.status(200).json(categories)
     },
     getById: async (req, res) => {
-        if (!req.params.id){
-            res.status(400).json("id is required");
+        if (!req.params.id) {
+            res.status(400).json("id is required")
             return
-        } 
+        }
         const id = +req.params.id
         console.log(id)
-        if (isNaN(id)){
-            res.status(400).json("id must be an integer");
-            return;
+        if (isNaN(id)) {
+            res.status(400).json("id must be an integer")
+            return
         }
         try {
-            const product = await ProductService.getById(id)
-            
-            if (!product){
+            const product = await CategoryService.getById(id)
+
+            if (!product) {
                 res.status(404).json("product not found")
-                return;
+                return
             }
-            
+
             res.json(product)
         }
         catch (error) {
@@ -53,26 +52,18 @@ export const ProductController: ProductControllerContract = {
             res.status(422).json("name is required.")
             return
         }
-        if (!body.description) {
-            res.status(422).json("description is required.")
-            return
-        }
-        if (!body.previewPhoto) {
-            res.status(422).json("image url is required.")
-            return
-        }
-        if (!body.categoryId) {
-            res.status(422).json("category ID is required.")
+        if (!body.icon) {
+            res.status(422).json("icon is required.")
             return
         }
         
         try {
-            const newProduct = await ProductService.create({...body})
-            if (!newProduct) {
-                res.status(404).json({message: "Product creation error"})
+            const newCategory = await CategoryService.create({...body})
+            if (!newCategory) {
+                res.status(404).json({message: "Category creation error"})
                 return
             }
-            res.status(200).json(newProduct)
+            res.status(200).json(newCategory)
         } catch (error) {
             res.status(500).json({message: "Internal server error"})
         }
@@ -88,12 +79,12 @@ export const ProductController: ProductControllerContract = {
             return;
         }
         const body = req.body
-        await ProductService.update(+id, body).then((product) => {
-            if (!product) {
-                res.status(500).json("Product update error")
+        await CategoryService.update(+id, body).then((category) => {
+            if (!category) {
+                res.status(500).json("category update error")
                 return
             }
-            res.status(200).json(product)
+            res.status(200).json(category)
         })
 
     },
@@ -107,13 +98,13 @@ export const ProductController: ProductControllerContract = {
             res.status(400).json("id must be an integer");
             return;
         }
-        await ProductService.delete(+id).then((result) => {
+        await CategoryService.delete(+id).then((result) => {
             if (result === "not found") {
-                res.status(404).json("Product not found")
+                res.status(404).json("Category not found")
                 return
             }
             else if (!result) {
-                res.status(500).json("Product deletion error")
+                res.status(500).json("Category deletion error")
                 return
             }
             res.status(200).json(result)
