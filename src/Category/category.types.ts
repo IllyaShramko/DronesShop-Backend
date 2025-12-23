@@ -10,6 +10,7 @@ export type CreateCategoryChecked = Prisma.CategoryCreateInput
 
 export type UpdateCategory = Prisma.CategoryUncheckedUpdateInput
 export type UpdateCategoryChecked = Prisma.CategoryUpdateInput
+
 export interface CategoryServiceContract {
     getAll: () => Promise<Category[]>
     getById: (id: number) => Promise<Category | null>
