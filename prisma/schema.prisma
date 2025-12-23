@@ -55,7 +55,7 @@ model Order {
   totalPrice     Int
   discountPrice  Int
   typePay        String
-  productOnOrder ProductOnOrder[]
+  products ProductOnOrder[]
 }
 
 model Product {
@@ -70,7 +70,7 @@ model Product {
   category   Category          @relation(fields: [categoryId], references: [id])
   categoryId Int
   blocksInfo     BlockInfo[]
-  productOnOrder ProductOnOrder[]
+  orders ProductOnOrder[]
 }
 
 model ProductOnOrder {

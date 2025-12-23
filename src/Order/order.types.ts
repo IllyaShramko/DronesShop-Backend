@@ -2,11 +2,9 @@ import { Prisma } from "../generated/prisma"
 import { Request, Response } from 'express' 
 
 export type Order = Prisma.OrderGetPayload<{}>
+export type OrderWithProducts = Prisma.OrderGetPayload<{include: {products: {include: {product: true}}}}>
+
 export type CreateOrder = Prisma.OrderUncheckedCreateInput
-export type OrderWithProducts = Prisma.OrderGetPayload<{include: {order: true}}>
-
-
-export type Create = Prisma.OrderUncheckedCreateInput
 export type CreateOrderChecked = Prisma.OrderCreateInput
 
 export type UpdateOrder = Prisma.OrderUncheckedUpdateInput
