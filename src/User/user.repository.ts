@@ -30,12 +30,6 @@ export const UserRepository: UserRepositoryContract = {
         })
         return updatedUser
     },
-    async forgotPassword(email, newPassword){
-        await Client.user.update({
-            where: {email},
-            data: {password: newPassword}
-        })
-    },
     async getAdressesByUserId(userId){
         const addresses = await Client.address.findMany({
             where: {userId}

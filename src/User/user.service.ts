@@ -47,10 +47,6 @@ export const UserService: UserServiceContract = {
         const updatedUser = await UserRepository.editInformation(id, data)
         return updatedUser
     },
-    async forgotPassword(email, newPassword){
-        const hashedPassword = await hash(newPassword, 10)
-        await UserRepository.forgotPassword(email, hashedPassword)
-    },
     async getAdresses(userId){
         const addresses = await UserRepository.getAdressesByUserId(userId)
         return addresses
