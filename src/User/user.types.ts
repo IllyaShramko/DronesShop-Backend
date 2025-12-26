@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { Prisma } from "../generated/prisma"
-
+import { OrderWithProducts } from "../Order/order.types"
 export type User = Prisma.UserGetPayload<{}>
 export type UserWithoutPassword = Prisma.UserGetPayload<{omit: {password: true}}>
 
@@ -25,6 +25,13 @@ export interface ForgotPasswordCredentials {
     email: string,
     newPassword: string
 }
+export interface AuthResponse {
+    token: string
+}
+
+export interface PasswordChangeResponse{
+    success: boolean
+}
 
 export interface UserControllerContract {
     register: (req: Request<object, ErrorResponse | UserAuthResponse, UserCreate>, res: Response<ErrorResponse | UserAuthResponse>) => Promise<void>
@@ -34,9 +41,12 @@ export interface UserControllerContract {
     getAdresses: (req: Request<object, ErrorResponse | Address[], object, object, {userId: number}>, res: Response<ErrorResponse | Address[], {userId: number}>) => Promise<void>,
     createAddress: (req: Request<object, ErrorResponse | Address, CreateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>,
     editAddress: (req: Request<{id: string}, ErrorResponse | Address, UpdateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>
-    // editPassword: (req: Request<object, ErrorResponse, ForgotPasswordCredentials>, res: Response<ErrorResponse>) => Promise<void>,
-    // verifyCode: (req: Request<{code: string}, ErrorResponse, object, Response<ErrorResponse>),
-    // forgotPassword: (req: Request<object, ErrorResponse, {emailnewPassord: string}>)
+    getMyOrders: (req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>) => Promise<void>
+    
+    changePassword(request: Request<object, ErrorResponse | AuthResponse, {password: string}, object, {userId: number}>, response: Response<ErrorResponse | AuthResponse, {userId: number}>): Promise<void>;
+    startPasswordChange(request: Request<object, ErrorResponse | "OK", {email: string}, object, {userId: number}>, response: Response<ErrorResponse | "OK", {userId: number}>): Promise<void>;
+    verifyPasswordCode(request: Request<{code: string}, ErrorResponse | PasswordChangeResponse, object, object, {userId: number}>, response: Response<ErrorResponse | PasswordChangeResponse, {userId: number}>): Promise<void>;
+    
 }
 
 export interface UserRepositoryContract {
@@ -47,9 +57,7 @@ export interface UserRepositoryContract {
     getAdressesByUserId: (userId: number) => Promise<Address[]>,
     createAddress: (data: CreateAddress) => Promise<Address>,
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
-    // editPassword: (email: string, newPassword: string) => Promise<void>,
-    // findCode: (code: string) => Promise<VerifyCode | null>,
-    // generateCode: (code: string, email: string) => Promise<VerifyCode>
+    changePassword(id: number, newPassword: string): Promise<UserWithoutPassword>
 }
 export interface UserServiceContract {
     register: (credentials: UserCreate) => Promise<string>,
@@ -59,6 +67,10 @@ export interface UserServiceContract {
     getAdresses: (userId: number) => Promise<Address[]>,
     createAddress: (data: CreateAddress) => Promise<Address>,
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
+    getMyOrders: (userId: number) => Promise<OrderWithProducts[]>
+    sendPasswordEmail(userId: number, userEmail: string): Promise<void>
+    checkCode(userId: number, code: string, autoDelete?: boolean): Promise<boolean>
+    changePassword(id: number, newPassword: string): Promise<string>
     // editPassword: (email: string, newPassword: string) => Promise<void>,
     // verifyCode: (code: string) => Promise<string>,
     // forgotPassword: (email: string) => Promise<void>

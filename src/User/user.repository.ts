@@ -22,6 +22,20 @@ export const UserRepository: UserRepositoryContract = {
         })
         return user
     },
+    async changePassword(id, newPassword){
+        try{
+            return await Client.user.update(
+                {
+                    where: {id},
+                    data: {password: newPassword},
+                    omit: {password: true}
+                }
+            )
+        }
+        catch(error){
+            throw error
+        }
+    },
     async editInformation(id, data){
         const updatedUser = await Client.user.update({
             where: {id},

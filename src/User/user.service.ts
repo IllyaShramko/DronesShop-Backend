@@ -4,6 +4,9 @@ import { sign } from "jsonwebtoken"
 import { ENV } from "../config/env"
 import { StringValue } from 'ms'
 import { compare, genSalt, hash } from "bcryptjs"
+import { OrderRepository } from "../Order/order.repository" 
+import { transporter } from "../config/mail"
+import { CODE_LENGTH, passwordCodes } from "../config/passwordChangeData"
 
 export const UserService: UserServiceContract = {
     async register (credentials){
@@ -58,5 +61,57 @@ export const UserService: UserServiceContract = {
     async editAddress(id, data){
         const address = await UserRepository.editAddress(id, data)
         return address
-    }
+    },
+    async getMyOrders (userId){
+        const orders = await OrderRepository.getByIdUser(userId)
+        return orders
+    },
+    async sendPasswordEmail(userId, userEmail) {
+        function generateCode(){
+            let code = ''
+            for (let index = 0; index < CODE_LENGTH; index++){
+                code+=`${Math.round(Math.random() * 9)}`
+            }
+            return code
+        }
+        const code = generateCode() 
+        passwordCodes.push({code: code, userId: userId})
+        transporter.sendMail({
+            from: 'Dronees',
+            to: userEmail,
+            subject: "Password restoration",
+            text: `Hello, you tried to restore password on our site, here is restoration code: ${code}`
+        })
+    },
+    async checkCode(userId, codeCheck, autoDelete) {
+        console.log(passwordCodes, "start")
+        const possibleCodeArray = passwordCodes.filter(attempt => attempt.userId == userId)
+        if (!possibleCodeArray.length){
+            throw Error("NOT_FOUND")
+        }
+        for (let possibleCode of possibleCodeArray){
+            if (possibleCode.code == codeCheck){
+                for (let toDelete of possibleCodeArray){ passwordCodes.splice(passwordCodes.indexOf(toDelete), 1) }
+                if (!autoDelete){
+                    passwordCodes.push({code: "-1", userId: userId})
+                }
+                console.log(passwordCodes, "end")
+                return true
+            }
+        }
+        return false
+    },
+    async changePassword(id, newPassword){
+        const verified = await this.checkCode(id, "-1")
+        if (!verified){
+            throw new Error("FORBIDDEN")
+        }
+        await this.checkCode(id, "-1", true)
+        const hashedPassword = await hash(newPassword, 10)
+        await UserRepository.changePassword(id, hashedPassword)
+        const token = sign({ id: id }, ENV.JWT_ACCESS_SECRET_KEY, { expiresIn: ENV.JWT_EXPIRES_IN as StringValue })
+        return token
+    },
+
+
 }

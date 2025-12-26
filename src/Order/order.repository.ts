@@ -13,18 +13,21 @@ export const OrderRepository: OrderRepositoryContract = {
             throw error
         }
     },
+    async getByIdUser(userId) {
+        try {
+            return await PrismaClient.order.findMany({
+                where: {userId: userId},
+                include: {products: {
+                    include: {product: true}
+                }}
+            })
+        } catch(error) {
+            throw error
+        }
+    },
     async getAll() {
         const order = await PrismaClient.order.findMany({})
         return order
-    },
-    async create(data) {
-        return await PrismaClient.order.create({data})
-    },
-    async update(id, data) {
-        return await PrismaClient.order.update({
-            where: {id},
-            data
-        })
     },
     async delete(id) {
         return await PrismaClient.order.delete({where:{id}})
