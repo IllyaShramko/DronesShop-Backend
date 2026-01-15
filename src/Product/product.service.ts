@@ -18,5 +18,8 @@ export const ProductService: ProductServiceContract = {
     },
     async delete(id) {
         return ProductRepository.delete(id)
+    },
+    async getSuggestions(popular, isNew, limit, offset) {
+        return ProductRepository.getSuggestions(popular, isNew, limit, offset)
     }
 }

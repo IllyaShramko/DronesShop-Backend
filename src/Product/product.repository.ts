@@ -48,5 +48,10 @@ export const ProductRepository: ProductRepositoryContract = {
     },
     async delete(id) {
         return await PrismaClient.product.delete({where:{id}})
+    },
+    async getSuggestions(popular, isNew, limit, offset) {
+
+        
+        return await PrismaClient.product.
     }
 }

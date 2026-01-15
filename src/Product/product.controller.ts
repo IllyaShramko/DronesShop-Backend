@@ -4,7 +4,7 @@ import { ProductControllerContract } from "./product.types"
 
 export const ProductController: ProductControllerContract = {
     getAll: async (req, res) => {
-        let categoryId: any = req.query.categoryId
+        let categoryId = req.query.categoryId
         if (categoryId) {
             categoryId = +categoryId
             if (isNaN(categoryId)) {
@@ -118,5 +118,42 @@ export const ProductController: ProductControllerContract = {
             }
             res.status(200).json(result)
         })
+    },
+    async getSuggestions(req, res) {
+        let popular = req.query.popular
+        let isNew = req.query.new
+        let limit = req.query.limit
+        let offset = req.query.offset
+
+        if (popular && isNew) {
+            res.status(400).json("Only one of parameters (popular or new) can be specified")
+            return
+        }
+        if (limit) {
+            limit = +limit
+            if (isNaN(limit)) {
+                res.status(400).json("limit must be a number")
+                return
+            }
+            else if (limit < 0) {
+                res.status(400).json("limit must be a positive integer")
+                return
+            }
+        }
+        if (offset) {
+            offset = +offset
+            if (isNaN(offset)) {
+                res.status(400).json("offset must be a number")
+                return
+            }
+            else if (offset < 0) {
+                res.status(400).json("offset must be a positive integer")
+                return
+            }
+        }
+        const products =  await ProductService.getSuggestions(
+            popular, isNew, limit, offset
+        )
+        res.status(200).json(products)
     }
 }

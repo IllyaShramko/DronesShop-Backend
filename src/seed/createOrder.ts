@@ -26,4 +26,4 @@ export async function createOrderForUser(userId: number, productIds?: number[]) 
 
 	return order;
 }
-createOrderForUser(1, [1])
+createOrderForUser(4, [1])
