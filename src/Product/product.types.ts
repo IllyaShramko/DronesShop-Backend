@@ -26,7 +26,8 @@ export interface ProductRepositoryContract {
     create: (data: CreateProduct) => Promise<Product>
     update: (id: number, data: UpdateProduct) => Promise<Product | null>
     delete: (id: number) => Promise<Product | null | string>
-    getSuggestions: (popular?: boolean, isNew?: boolean, limit?: number, offset?: number) => Promise<Product[]>
+    getPopular: (limit?: number, offset?: number) => Promise<Product[]>
+    getNew: (limit?: number, offset?: number) => Promise<Product[]>
 }
 
 export interface ProductControllerContract {

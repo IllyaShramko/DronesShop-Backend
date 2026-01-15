@@ -20,6 +20,10 @@ export const ProductService: ProductServiceContract = {
         return ProductRepository.delete(id)
     },
     async getSuggestions(popular, isNew, limit, offset) {
-        return ProductRepository.getSuggestions(popular, isNew, limit, offset)
+        if (popular) {
+            return ProductRepository.getPopular(limit, offset)
+        } else {
+            return ProductRepository.getNew(limit, offset)
+        }
     }
 }

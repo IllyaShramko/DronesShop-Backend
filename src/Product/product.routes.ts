@@ -7,6 +7,8 @@ const ProductRouter: express.Router = express.Router()
 
 ProductRouter.get("/", ProductController.getAll);
 
+ProductRouter.get("/suggestions", ProductController.getSuggestions)
+
 ProductRouter.get("/:id", ProductController.getById);
 
 ProductRouter.post("/", authMiddleware, ProductController.create);

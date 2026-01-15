@@ -49,9 +49,24 @@ export const ProductRepository: ProductRepositoryContract = {
     async delete(id) {
         return await PrismaClient.product.delete({where:{id}})
     },
-    async getSuggestions(popular, isNew, limit, offset) {
-
-        
-        return await PrismaClient.product.
+    async getPopular(limit, offset) {
+        return await PrismaClient.product.findMany({
+            skip: offset,
+            take: limit,
+            orderBy: {
+                orders: {
+                    _count: "desc"
+                }
+            }
+        })
+    },
+    async getNew(limit, offset) {
+        return await PrismaClient.product.findMany({
+            skip: offset,
+            take: limit,
+            orderBy: {
+                id: "desc"
+            }
+        })
     }
 }

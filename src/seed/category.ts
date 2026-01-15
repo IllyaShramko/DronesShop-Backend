@@ -1,28 +1,29 @@
-import { PrismaClient as PC } from "../generated/prisma/client"; 
+
+import { PrismaClient as PC, Prisma } from "../generated/prisma"; 
 
 const PrismaClient = new PC()
-
-async function createBlock() {
-    return await PrismaClient.blockInfo.create({
-        data: {
-            title: "ПОутжнczxcvxcvvvbnvxxccbzий",
-            description: "cxazxcvckvaokvpovadv dkvoasdv odsvasdvadsvava adapivdf",
-            typeView: "v2",
-            priorityView: 1,
-            media: "strinsxczgs",
-            productId: 2
+async function getSuggestions(popular?, isNew?, limit?, offset?) {
+    const products = await PrismaClient.product.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: popular 
+            ? {
+                orders: {
+                    _count: 'desc'
+                }
+            } 
+            : {
+                id: 'desc' 
+            },
+        include: {
+            category: true,
         }
-    })
-}
-// createBlock()
+    });
 
-async function createParam() {
-    return await PrismaClient.parametersInfo.create({
-        data: {
-            name: "Номінальна потужність",
-            parameter: "1500 Вт",
-            blockInfoId: 2
-        }
-    })
+    return products;
 }
 
+(async () => {
+    const products = await getSuggestions(true, false, 1);
+    console.log(products);
+})();
