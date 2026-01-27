@@ -1,13 +1,13 @@
 import express from 'express'
 import { ProductController } from './product.controller'
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware, pagginationMiddleware } from '../middlewares';
 
 const ProductRouter: express.Router = express.Router()
 
 
-ProductRouter.get("/", ProductController.getAll);
+ProductRouter.get("/", pagginationMiddleware, ProductController.getAll);
 
-ProductRouter.get("/suggestions", ProductController.getSuggestions)
+ProductRouter.get("/suggestions", pagginationMiddleware, ProductController.getSuggestions)
 
 ProductRouter.get("/:id", ProductController.getById);
 

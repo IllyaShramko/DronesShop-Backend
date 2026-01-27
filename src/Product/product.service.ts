@@ -4,8 +4,8 @@ import { ProductRepository } from './product.repository'
 const client = new PrismaClient()
 
 export const ProductService: ProductServiceContract = {
-    getAll: async (categoryId) => {
-        return ProductRepository.getAll(categoryId)
+    getAll: async (categoryId, limit, offset) => {
+        return ProductRepository.getAll(categoryId, limit, offset)
     },
     getById: async (id) => {
         return ProductRepository.getById(id)

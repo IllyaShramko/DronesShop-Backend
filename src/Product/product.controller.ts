@@ -1,10 +1,13 @@
 import { Request, Response } from "express"
 import { ProductService } from "./product.service"
 import { ProductControllerContract } from "./product.types"
+import { off } from "node:process"
 
 export const ProductController: ProductControllerContract = {
     getAll: async (req, res) => {
         let categoryId = req.query.categoryId
+        let limit = res.locals.limit
+        let offset = res.locals.offset
         if (categoryId) {
             categoryId = +categoryId
             if (isNaN(categoryId)) {
@@ -12,9 +15,8 @@ export const ProductController: ProductControllerContract = {
                 return
             }
         }
-        ProductService.getAll(categoryId).then((products) => {
-            res.status(200).json(products)
-        })
+        const products = await ProductService.getAll(categoryId, limit, offset)
+        res.status(200).json(products)
     },
     getById: async (req, res) => {
         if (!req.params.id){
@@ -122,34 +124,12 @@ export const ProductController: ProductControllerContract = {
     async getSuggestions(req, res) {
         let popular = req.query.popular
         let isNew = req.query.new
-        let limit = req.query.limit
-        let offset = req.query.offset
+        let limit = res.locals.limit
+        let offset = res.locals.offset
 
         if (popular && isNew) {
             res.status(400).json("Only one of parameters (popular or new) can be specified")
             return
-        }
-        if (limit) {
-            limit = +limit
-            if (isNaN(limit)) {
-                res.status(400).json("limit must be a number")
-                return
-            }
-            else if (limit < 0) {
-                res.status(400).json("limit must be a positive integer")
-                return
-            }
-        }
-        if (offset) {
-            offset = +offset
-            if (isNaN(offset)) {
-                res.status(400).json("offset must be a number")
-                return
-            }
-            else if (offset < 0) {
-                res.status(400).json("offset must be a positive integer")
-                return
-            }
         }
         const products =  await ProductService.getSuggestions(
             popular, isNew, limit, offset

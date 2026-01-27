@@ -23,17 +23,22 @@ export const ProductRepository: ProductRepositoryContract = {
             throw error
         }
     },
-    async getAll(categoryId) {
+    async getAll(categoryId, take, skip) {
         if (categoryId){
             const products = await PrismaClient.product.findMany({
                 where: {
                     categoryId: categoryId
-                }
+                },
+                skip,
+                take
             })
             return products
         }
         else{
-            const products = await PrismaClient.product.findMany({}) 
+            const products = await PrismaClient.product.findMany({
+                skip,
+                take
+            }) 
             return products
         }
     },
