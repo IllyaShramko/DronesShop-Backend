@@ -11,9 +11,9 @@ ProductRouter.get("/suggestions", pagginationMiddleware, ProductController.getSu
 
 ProductRouter.get("/:id", ProductController.getById);
 
-ProductRouter.post("/", authMiddleware, ProductController.create);
+ProductRouter.post("/", ProductController.create);
 
-ProductRouter.put("/:id", authMiddleware, ProductController.update)
+ProductRouter.put("/:id", ProductController.update)
 
-ProductRouter.delete("/:id", authMiddleware, ProductController.delete)
+ProductRouter.delete("/:id", ProductController.delete)
 export { ProductRouter }
