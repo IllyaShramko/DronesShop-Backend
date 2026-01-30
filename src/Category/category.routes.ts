@@ -9,9 +9,9 @@ CategoryRouter.get("/", CategoryWithProducts.getAll);
 
 CategoryRouter.get("/:id", CategoryWithProducts.getById);
 
-CategoryRouter.post("/",authMiddleware, CategoryWithProducts.create);
+CategoryRouter.post("/", CategoryWithProducts.create);
 
-CategoryRouter.put("/:id", authMiddleware, CategoryWithProducts.update)
+CategoryRouter.put("/:id", CategoryWithProducts.update)
 
-CategoryRouter.delete("/:id", authMiddleware, CategoryWithProducts.delete)
+CategoryRouter.delete("/:id", CategoryWithProducts.delete)
 export { CategoryRouter }
