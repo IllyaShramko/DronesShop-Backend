@@ -15,6 +15,8 @@ export function pagginationMiddleware(req:Request, res: Response, next: NextFunc
             return
         }
         res.locals.limit = +limit
+    } else {
+        res.locals.limit = 5
     }
     if (offset) {
         if (isNaN(+offset)) {
@@ -26,6 +28,9 @@ export function pagginationMiddleware(req:Request, res: Response, next: NextFunc
             return
         }
         res.locals.offset = +offset
+    } else {
+        res.locals.offset = 0
     }
+    
     next()
 }
