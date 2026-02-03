@@ -17,7 +17,7 @@ export interface ProductServiceContract {
     create: (data: CreateProduct) => Promise<Product | null>
     update: (id: number, data: UpdateProductChecked) => Promise<Product | null>
     delete: (id: number) => Promise<Product | null | string>
-    getSuggestions: (popular?: boolean, isNew?: boolean, limit?: number, offset?: number) => Promise<Product[]>
+    getSuggestions: (popular?: boolean, isNew?: boolean, limit?: number, offset?: number, sameAs?: number) => Promise<Product[]>
 }
 
 export interface ProductRepositoryContract {
@@ -28,6 +28,7 @@ export interface ProductRepositoryContract {
     delete: (id: number) => Promise<Product | null | string>
     getPopular: (limit?: number, offset?: number) => Promise<Product[]>
     getNew: (limit?: number, offset?: number) => Promise<Product[]>
+    getSimilar: (productId: number, limit: number) => Promise<Product[]>
 }
 
 export interface ProductControllerContract {
@@ -36,5 +37,5 @@ export interface ProductControllerContract {
     create: (req: Request<object, Product | string, CreateProduct, object>, res: Response<Product | string | object | null>) => Promise<void>
     update: (req: Request<{ id: string }, Product | string, UpdateProductChecked, object>, res: Response<Product | string | object>) => Promise<void>
     delete: (req: Request<{ id: string }, Product | string, object>, res: Response<Product | string | object>) => Promise<void>
-    getSuggestions: (req: Request<object, Product[] | string, object, {popular?: boolean, new?: boolean, limit?: number, offset?: number}>, res: Response<Product[] | string | object>) => Promise<void>
+    getSuggestions: (req: Request<object, Product[] | string, object, {popular?: boolean, new?: boolean, limit?: number, offset?: number, sameAs?: number}>, res: Response<Product[] | string | object>) => Promise<void>
 }

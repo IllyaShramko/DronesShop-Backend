@@ -19,9 +19,11 @@ export const ProductService: ProductServiceContract = {
     async delete(id) {
         return ProductRepository.delete(id)
     },
-    async getSuggestions(popular, isNew, limit, offset) {
+    async getSuggestions(popular, isNew, limit, offset, sameAs) {
         if (popular) {
             return ProductRepository.getPopular(limit, offset)
+        } else if (sameAs) {
+            return ProductRepository.getSimilar(sameAs, limit)
         } else {
             return ProductRepository.getNew(limit, offset)
         }

@@ -126,14 +126,27 @@ export const ProductController: ProductControllerContract = {
         let isNew = req.query.new
         let limit = res.locals.limit
         let offset = res.locals.offset
+        let sameAs = req.query.sameAs
 
         if (popular && isNew) {
             res.status(400).json("Only one of parameters (popular or new) can be specified")
             return
         }
+        if (sameAs) {
+            if (isNaN(+sameAs)) {
+                res.status(400).json("offset must be a number")
+                return
+            }
+            else if (+sameAs < 0) {
+                res.status(400).json("offset must be a positive integer")
+                return
+            }
+            sameAs = +sameAs
+        }
         const products =  await ProductService.getSuggestions(
-            popular, isNew, limit, offset
+            popular, isNew, limit, offset, sameAs
         )
         res.status(200).json(products)
-    }
+    },
+    
 }

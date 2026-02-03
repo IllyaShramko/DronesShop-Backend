@@ -73,5 +73,57 @@ export const ProductRepository: ProductRepositoryContract = {
                 id: "desc"
             }
         })
-    }
+    },
+    async getSimilar(productId, limit) {
+        const target = await PrismaClient.product.findUnique({
+            where: { id: productId }
+        });
+
+        if (!target) return [];
+
+        let result = [];
+        let excludedIds = [productId];
+
+        const words = target.name.split(' ').filter(w => w.length >= 2);
+        if (words.length > 0) {
+            const byName = await PrismaClient.product.findMany({
+                where: {
+                    OR: words.map(word => ({ name: { contains: word } })),
+                    id: { not: productId }
+                },
+                take: limit
+            });
+            result = [...byName];
+            excludedIds = [...excludedIds, ...byName.map(p => p.id)];
+        }
+
+        if (result.length < limit) {
+            const byCategory = await PrismaClient.product.findMany({
+                where: {
+                    categoryId: target.categoryId,
+                    id: { notIn: excludedIds }
+                },
+                take: limit - result.length
+            });
+            result = [...result, ...byCategory];
+            excludedIds = [...excludedIds, ...byCategory.map(p => p.id)];
+        }
+
+        if (result.length < limit) {
+            const n = 2000;
+            const byPrice = await PrismaClient.product.findMany({
+                where: {
+                    price: {
+                        gte: target.price - n,
+                        lte: target.price + n
+                    },
+                    id: { notIn: excludedIds }
+                },
+                take: limit - result.length
+            });
+            result = [...result, ...byPrice];
+        }
+
+        return result;
+    },
 }
