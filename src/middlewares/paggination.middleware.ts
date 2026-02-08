@@ -27,7 +27,7 @@ export function pagginationMiddleware(req:Request, res: Response, next: NextFunc
             res.status(400).json("offset must be a positive integer")
             return
         }
-        res.locals.offset = +offset
+        res.locals.offset = res.locals.limit * +offset
     } else {
         res.locals.offset = 0
     }

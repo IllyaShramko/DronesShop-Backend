@@ -32,7 +32,7 @@ async function seedBlocksForProduct( productId: number, includeParams: boolean, 
 
 async function main() {
     try {
-        await seedBlocksForProduct(4, true, 3, ["v1", "v3", "v2"])
+        await seedBlocksForProduct(3, true, 4, ["v1", "v3", "v2", 'v1'])
     } catch (error) {
         console.error("Error:", error);
     } finally {

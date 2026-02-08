@@ -134,11 +134,11 @@ export const ProductController: ProductControllerContract = {
         }
         if (sameAs) {
             if (isNaN(+sameAs)) {
-                res.status(400).json("offset must be a number")
+                res.status(400).json("sameAs must be a number")
                 return
             }
             else if (+sameAs < 0) {
-                res.status(400).json("offset must be a positive integer")
+                res.status(400).json("sameAs must be a positive integer")
                 return
             }
             sameAs = +sameAs
