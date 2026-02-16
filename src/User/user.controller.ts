@@ -181,4 +181,30 @@ export const UserController: UserControllerContract = {
             response.status(500).json({message: "Internal Server Error"})
         }
     },
+    async sendContactMail(req, res){
+        try {
+            const {name, phonenumber, email, message} = req.body
+            if (!name){
+                res.status(400).json({message: "Name is required"})
+                return
+            }
+            if (!phonenumber){
+                res.status(400).json({message: "Phone number is required"})
+                return
+            }
+            if (!email){
+                res.status(400).json({message: "Email is required"})
+                return
+            }
+            if (!message){
+                res.status(400).json({message: "Message is required"})
+                return
+            }
+            await UserService.sendContactMail(name, phonenumber, email, message)
+            res.status(200).json({message: "OK"})
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message: "Internal Server Error"})
+        }
+    }
 }

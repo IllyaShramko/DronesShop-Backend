@@ -112,6 +112,13 @@ export const UserService: UserServiceContract = {
         const token = sign({ id: id }, ENV.JWT_ACCESS_SECRET_KEY, { expiresIn: ENV.JWT_EXPIRES_IN as StringValue })
         return token
     },
-
-
+    async sendContactMail(name, phonenumber, email, message){
+        transporter.sendMail({
+            from: 'Dronees',
+            to: ENV.CONTACT_EMAIL,
+            subject: `Письмо від користувача ${name} сайту`,
+            text: `Від користувача ${name} було отримано повідомлення:\nІм'я: ${name}\nНомер телефону: ${phonenumber}\nEmail: ${email}\nПовідомлення: ${message}`
+        })
+        return "OK"
+    }
 }

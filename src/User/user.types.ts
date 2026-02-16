@@ -47,6 +47,7 @@ export interface UserControllerContract {
     startPasswordChange(request: Request<object, ErrorResponse | "OK", {email: string}, object, {userId: number}>, response: Response<ErrorResponse | "OK", {userId: number}>): Promise<void>;
     verifyPasswordCode(request: Request<{code: string}, ErrorResponse | PasswordChangeResponse, object, object, {userId: number}>, response: Response<ErrorResponse | PasswordChangeResponse, {userId: number}>): Promise<void>;
     
+    sendContactMail(req: Request<object, ErrorResponse | "OK", {name: string, phonenumber: string, email: string, message: string}, object>, res: Response<ErrorResponse | "OK">): Promise<void>
 }
 
 export interface UserRepositoryContract {
@@ -58,6 +59,7 @@ export interface UserRepositoryContract {
     createAddress: (data: CreateAddress) => Promise<Address>,
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
     changePassword(id: number, newPassword: string): Promise<UserWithoutPassword>
+    // saveContactMail(email: string, message: string): Promise<void>
 }
 export interface UserServiceContract {
     register: (credentials: UserCreate) => Promise<string>,
@@ -71,7 +73,5 @@ export interface UserServiceContract {
     sendPasswordEmail(userId: number, userEmail: string): Promise<void>
     checkCode(userId: number, code: string, autoDelete?: boolean): Promise<boolean>
     changePassword(id: number, newPassword: string): Promise<string>
-    // editPassword: (email: string, newPassword: string) => Promise<void>,
-    // verifyCode: (code: string) => Promise<string>,
-    // forgotPassword: (email: string) => Promise<void>
+    sendContactMail(name: string, phonenumber: string, email: string, message: string): Promise<string>
 } 

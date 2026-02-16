@@ -19,3 +19,5 @@ UserRouter.post('/addresses', authMiddleware, UserController.createAddress)
 UserRouter.put('/addresses/:id', authMiddleware, UserController.editAddress)
 // 
 UserRouter.get("/orders", authMiddleware, UserController.getMyOrders)
+// 
+UserRouter.post("/contact", UserController.sendContactMail)
