@@ -32,9 +32,20 @@ export const UserController: UserControllerContract = {
     register: async(req, res) =>{
         try {
             let body = req.body
-            
             if (!body){
                 res.status(400).json({ message: 'body is required' })
+                return
+            }
+            if (!body.firstName){
+                res.status(400).json({ message: 'firstName is required' })
+                return
+            }
+            if (!body.email){
+                res.status(400).json({ message: 'email is required' })
+                return
+            }
+            if (!body.password){
+                res.status(400).json({ message: 'password is required' })
                 return
             }
             const token = await UserService.register(body)
