@@ -3,8 +3,6 @@ import { PrismaClient as PC, Prisma } from "../generated/prisma";
 
 const Client = new PC()
 
-
-
 export const UserRepository: UserRepositoryContract = {
     async create(credentials) {
         return await Client.user.create({data: credentials})
@@ -60,5 +58,26 @@ export const UserRepository: UserRepositoryContract = {
             data
         })
         return address
+    },
+    async createVerificationCode(data) {
+        return await Client.verificationCode.create({ data })
+    },
+    async findVerificationCode(code) {
+        return await Client.verificationCode.findFirst({
+            where: { code }
+        })
+    },
+    async updateVerificationCode(id, data) {
+        return await Client.verificationCode.update({
+            where: { id },
+            data
+        })
+    },
+    async resetPassword(email, newPassword) {
+        const user = await this.findByEmail(email)
+        if (!user) {
+            throw new Error("USER_NOT_EXISTS")
+        }
+        return await this.changePassword(user.id, newPassword)
     }
 }

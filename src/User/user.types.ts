@@ -43,22 +43,26 @@ export interface UserControllerContract {
     editAddress: (req: Request<{id: string}, ErrorResponse | Address, UpdateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>
     getMyOrders: (req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>) => Promise<void>
     
-    changePassword(request: Request<object, ErrorResponse | AuthResponse, {password: string}, object, {userId: number}>, response: Response<ErrorResponse | AuthResponse, {userId: number}>): Promise<void>;
-    startPasswordChange(request: Request<object, ErrorResponse | "OK", {email: string}, object, {userId: number}>, response: Response<ErrorResponse | "OK", {userId: number}>): Promise<void>;
-    verifyPasswordCode(request: Request<{code: string}, ErrorResponse | PasswordChangeResponse, object, object, {userId: number}>, response: Response<ErrorResponse | PasswordChangeResponse, {userId: number}>): Promise<void>;
+    startPasswordReset(request: Request<object, ErrorResponse | {message: string}, {email: string, url: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
+    verifyPasswordCode(request: Request<object, ErrorResponse | {message: string}, {code: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
+    resetPassword(request: Request<object, ErrorResponse | {message: string}, {code: string, email: string, newPassword: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
     
     sendContactMail(req: Request<object, ErrorResponse | "OK", {name: string, phonenumber: string, email: string, message: string}, object>, res: Response<ErrorResponse | "OK">): Promise<void>
 }
 
 export interface UserRepositoryContract {
-    create: (credentials: UserCreate) => Promise<User >,
+    create: (credentials: UserCreate) => Promise<User>,
     findByEmail: (email: string) => Promise<User | null>,
     findByIdWithoutPassword: (id: number) => Promise<UserWithoutPassword | null>,
     editInformation: (id: number, data: UserUpdate) => Promise<UserWithoutPassword>,
     getAdressesByUserId: (userId: number) => Promise<Address[]>,
     createAddress: (data: CreateAddress) => Promise<Address>,
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
-    changePassword(id: number, newPassword: string): Promise<UserWithoutPassword>
+    changePassword(id: number, newPassword: string): Promise<UserWithoutPassword>,
+    createVerificationCode: (data: { email: string; code: string; expiresAt: Date; userId: number }) => Promise<VerifyCode>,
+    findVerificationCode: (code: string) => Promise<VerifyCode | null>,
+    updateVerificationCode: (id: number, data: Partial<{ expiresAt: Date; used: boolean }>) => Promise<VerifyCode>,
+    resetPassword: (email: string, newPassword: string) => Promise<UserWithoutPassword>
     // saveContactMail(email: string, message: string): Promise<void>
 }
 export interface UserServiceContract {
@@ -69,9 +73,9 @@ export interface UserServiceContract {
     getAdresses: (userId: number) => Promise<Address[]>,
     createAddress: (data: CreateAddress) => Promise<Address>,
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
-    getMyOrders: (userId: number) => Promise<OrderWithProducts[]>
-    sendPasswordEmail(userId: number, userEmail: string): Promise<void>
-    checkCode(userId: number, code: string, autoDelete?: boolean): Promise<boolean>
-    changePassword(id: number, newPassword: string): Promise<string>
+    getMyOrders: (userId: number) => Promise<OrderWithProducts[]>,
+    startPasswordReset: (email: string, url: string) => Promise<void>,
+    verifyPasswordCode: (code: string) => Promise<{ message: string }>,
+    resetPassword: (code: string, email: string, newPassword: string) => Promise<{ message: string }>,
     sendContactMail(name: string, phonenumber: string, email: string, message: string): Promise<string>
 } 

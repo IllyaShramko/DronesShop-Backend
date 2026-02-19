@@ -6,7 +6,9 @@ import { StringValue } from 'ms'
 import { compare, genSalt, hash } from "bcryptjs"
 import { OrderRepository } from "../Order/order.repository" 
 import { transporter } from "../config/mail"
-import { CODE_LENGTH, passwordCodes } from "../config/passwordChangeData"
+
+const CODE_LENGTH = 10
+
 
 export const UserService: UserServiceContract = {
     async register (credentials){
@@ -66,7 +68,11 @@ export const UserService: UserServiceContract = {
         const orders = await OrderRepository.getByIdUser(userId)
         return orders
     },
-    async sendPasswordEmail(userId, userEmail) {
+    async startPasswordReset(email, url) {
+        const user = await UserRepository.findByEmail(email)
+        if (!user) {
+            throw new Error("USER_DOESNT_EXISTS")
+        }
         function generateCode(){
             let code = ''
             for (let index = 0; index < CODE_LENGTH; index++){
@@ -74,43 +80,46 @@ export const UserService: UserServiceContract = {
             }
             return code
         }
-        const code = generateCode() 
-        passwordCodes.push({code: code, userId: userId})
+        const code = generateCode()
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000)
+        await UserRepository.createVerificationCode({
+            email,
+            code,
+            expiresAt,
+            userId: user.id
+        })
         transporter.sendMail({
             from: 'Dronees',
-            to: userEmail,
+            to: email,
             subject: "Password restoration",
-            text: `Hello, you tried to restore password on our site, here is restoration code: ${code}`
+            text: `To reset your password, please use the following url: ${url}?code=${code}. This code will expire in 15 minutes.\nIf you didn't request a password reset, please ignore this email.`
         })
     },
-    async checkCode(userId, codeCheck, autoDelete) {
-        console.log(passwordCodes, "start")
-        const possibleCodeArray = passwordCodes.filter(attempt => attempt.userId == userId)
-        if (!possibleCodeArray.length){
-            throw Error("NOT_FOUND")
+    async verifyPasswordCode(code) {
+        const verificationCode = await UserRepository.findVerificationCode(code)
+        if (!verificationCode) {
+            return { message: "CODE_DOESNT_EXISTS" }
         }
-        for (let possibleCode of possibleCodeArray){
-            if (possibleCode.code == codeCheck){
-                for (let toDelete of possibleCodeArray){ passwordCodes.splice(passwordCodes.indexOf(toDelete), 1) }
-                if (!autoDelete){
-                    passwordCodes.push({code: "-1", userId: userId})
-                }
-                console.log(passwordCodes, "end")
-                return true
-            }
+        if (verificationCode.expiresAt < new Date()) {
+            return { message: "CODE_EXPIRED" }
         }
-        return false
+        return { message: "SUCCESS" }
     },
-    async changePassword(id, newPassword){
-        const verified = await this.checkCode(id, "-1")
-        if (!verified){
-            throw new Error("FORBIDDEN")
+    async resetPassword(code, email, newPassword) {
+        const verificationCode = await UserRepository.findVerificationCode(code)
+        if (!verificationCode) {
+            return { message: "CODE_DOESNT_EXISTS" }
         }
-        await this.checkCode(id, "-1", true)
+        if (verificationCode.email !== email) {
+            return { message: "CODE_DOESNT_MATCH_EMAIL" }
+        }
+        if (verificationCode.expiresAt < new Date()) {
+            return { message: "CODE_EXPIRED" }
+        } 
+        await UserRepository.updateVerificationCode(verificationCode.id, { expiresAt: new Date() })
         const hashedPassword = await hash(newPassword, 10)
-        await UserRepository.changePassword(id, hashedPassword)
-        const token = sign({ id: id }, ENV.JWT_ACCESS_SECRET_KEY, { expiresIn: ENV.JWT_EXPIRES_IN as StringValue })
-        return token
+        await UserRepository.resetPassword(email, hashedPassword)
+        return { message: "SUCCESS" }
     },
     async sendContactMail(name, phonenumber, email, message){
         transporter.sendMail({

@@ -25,6 +25,7 @@ model User {
   password    String
   orders      Order[]
   addresses   Address[]
+  verificationCodes VerificationCode[]
 }
 
 model Address {
@@ -116,6 +117,8 @@ model VerificationCode {
   email     String   
   code      String
   expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 
   @@index([email])
 }

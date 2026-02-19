@@ -7,9 +7,9 @@ export const UserRouter: Router = Router()
 UserRouter.post('/login', UserController.login)
 UserRouter.post('/register', UserController.register)
 // 
-UserRouter.post('/password', authMiddleware, UserController.startPasswordChange)
-UserRouter.get('/password/:code', authMiddleware, UserController.verifyPasswordCode)
-UserRouter.patch('/password', authMiddleware, UserController.changePassword)
+UserRouter.post('/password', UserController.startPasswordReset)
+UserRouter.post('/password/verify', UserController.verifyPasswordCode)
+UserRouter.post('/password/change', UserController.resetPassword)
 // 
 UserRouter.get('/me', authMiddleware, UserController.me)
 UserRouter.put('/me', authMiddleware, UserController.editInformation)
