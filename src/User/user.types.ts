@@ -10,6 +10,11 @@ export type UpdateAddress = Prisma.AddressUncheckedUpdateInput
 
 export type VerifyCode = Prisma.VerificationCodeGetPayload<{}>
 
+export type VerifyCodeResponse = {
+    message: string,
+    email: string | null
+}
+
 export type ErrorResponse = {message: string}
 export type UserAuthResponse = {token: string}
 
@@ -44,7 +49,7 @@ export interface UserControllerContract {
     getMyOrders: (req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>) => Promise<void>
     
     startPasswordReset(request: Request<object, ErrorResponse | {message: string}, {email: string, url: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
-    verifyPasswordCode(request: Request<object, ErrorResponse | {message: string}, {code: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
+    verifyPasswordCode(request: Request<object, ErrorResponse | VerifyCodeResponse, {code: string}>, response: Response<ErrorResponse | VerifyCodeResponse>): Promise<void>;
     resetPassword(request: Request<object, ErrorResponse | {message: string}, {code: string, email: string, newPassword: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
     
     sendContactMail(req: Request<object, ErrorResponse | "OK", {name: string, phonenumber: string, email: string, message: string}, object>, res: Response<ErrorResponse | "OK">): Promise<void>
@@ -75,7 +80,7 @@ export interface UserServiceContract {
     editAddress: (id: number, data: UpdateAddress) => Promise<Address>,
     getMyOrders: (userId: number) => Promise<OrderWithProducts[]>,
     startPasswordReset: (email: string, url: string) => Promise<void>,
-    verifyPasswordCode: (code: string) => Promise<{ message: string }>,
+        verifyPasswordCode: (code: string) => Promise<VerifyCodeResponse>,
     resetPassword: (code: string, email: string, newPassword: string) => Promise<{ message: string }>,
     sendContactMail(name: string, phonenumber: string, email: string, message: string): Promise<string>
 } 

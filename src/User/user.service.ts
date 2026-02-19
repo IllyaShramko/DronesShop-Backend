@@ -98,12 +98,12 @@ export const UserService: UserServiceContract = {
     async verifyPasswordCode(code) {
         const verificationCode = await UserRepository.findVerificationCode(code)
         if (!verificationCode) {
-            return { message: "CODE_DOESNT_EXISTS" }
+            return { message: "CODE_DOESNT_EXISTS", email: null }
         }
         if (verificationCode.expiresAt < new Date()) {
-            return { message: "CODE_EXPIRED" }
+            return { message: "CODE_EXPIRED", email: null }
         }
-        return { message: "SUCCESS" }
+        return { message: "SUCCESS", email: verificationCode.email }
     },
     async resetPassword(code, email, newPassword) {
         const verificationCode = await UserRepository.findVerificationCode(code)
