@@ -18,7 +18,7 @@ export const UserController: UserControllerContract = {
             console.log(error)
             if(error instanceof Error){
                 switch (error.message) {
-                    case "NOT_FOUND":
+                    case "USER_NOT_FOUND":
                         res.status(401).json({message: 'wrong credentials'})
                         return
                     case "WRONG_CREDENTIALS":
@@ -167,6 +167,7 @@ export const UserController: UserControllerContract = {
     async resetPassword(req, res){
         try{    
             const { code, email, newPassword } = req.body
+            console.log(req.body)
             if (!code || !email || !newPassword){
                 res.status(400).json({message: "Code, email and newPassword are required"})
                 return

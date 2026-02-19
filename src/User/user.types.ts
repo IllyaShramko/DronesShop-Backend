@@ -68,7 +68,6 @@ export interface UserRepositoryContract {
     findVerificationCode: (code: string) => Promise<VerifyCode | null>,
     updateVerificationCode: (id: number, data: Partial<{ expiresAt: Date; used: boolean }>) => Promise<VerifyCode>,
     resetPassword: (email: string, newPassword: string) => Promise<UserWithoutPassword>
-    // saveContactMail(email: string, message: string): Promise<void>
 }
 export interface UserServiceContract {
     register: (credentials: UserCreate) => Promise<string>,
