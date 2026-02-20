@@ -17,7 +17,7 @@
     "start": "ts-node ./src/server.ts",
     "init-db": "prisma migrate dev --name init",
     "format-db": "prisma format",
-    "seed": "ts-node ./src/seed/category.ts",
+    "seed": "ts-node ./src/seed/index.ts",
     "create-order": "ts-node ./src/seed/createOrder.ts"
   },
   "devDependencies": {
