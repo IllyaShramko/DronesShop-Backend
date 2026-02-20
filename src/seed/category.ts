@@ -1,25 +1,43 @@
-import { PrismaClient } from "../generated/prisma"
+import { PrismaClient } from '../generated/prisma';
 
-export async function seedBlocksForProduct(
-    prisma: PrismaClient,
-    productId: number
-) {
-    for (let i = 1; i <= 4; i++) {
+const prisma = new PrismaClient();
+
+async function seedBlocksForProduct( productId: number, includeParams: boolean, countBlocks: number, typesView: string[] ) {
+    console.log(`Product for create blocksInfo: ${productId}...`);
+
+    for (let i = 0; i < countBlocks; i++) {
+        const isLastBlock = i === countBlocks - 1;
+        const currentType = typesView[i] || "v1";
+
         await prisma.blockInfo.create({
             data: {
                 title: "Володійте кожним кутом",
-                description: "Професійна система камер забезпечує деталізоване зображення в будь-яких умовах.",
+                description: "Представляємо вдосконалену систему з трьома камерами, де кожен об'єктив має свої переваги, створюючи виняткові зображення - від широких ширококутних пейзажів до детальних телефото-знімків крупним планом. Усі три камери оснащені функцією Dual Native ISO Fusion, яка бездоганно поєднує переваги високих і низьких значень ISO для захоплення приголомшливих деталей, яких неможливо досягти за допомогою традиційних рішень. ",
                 media: "",
-                typeView: ["v1", "v2", "v3", "v1"][i - 1],
-                priorityView: i,
+                typeView: currentType,
+                priorityView: i + 1,
                 productId: productId,
-                params: i === 4 ? {
-                    create: [
-                        { name: "Дальність", parameter: "до 250 м" },
-                        { name: "Режимів", parameter: "10" }
-                    ]
+                params: (includeParams && isLastBlock) ? {
+                create: [
+                    { name: "Дальність", parameter: "до 250 м" },
+                    { name: "Режимів", parameter: "10" }
+                ]
                 } : undefined
             }
-        })
+        });
+    }
+
+    console.log(`Succesfully created ${countBlocks} blocksInfo.`);
+}
+
+async function main() {
+    try {
+        await seedBlocksForProduct(3, true, 4, ["v1", "v3", "v2", 'v1'])
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        await prisma.$disconnect();
     }
 }
+
+main();

@@ -21,7 +21,9 @@ export async function createOrderForUser(userId: number, productIds?: number[]) 
 			create: productIds.map((pid) => ({ product: { connect: { id: pid } }, ordered: 1 })),
 		};
 	}
+
 	const order = await prisma.order.create({ data });
+
 	return order;
 }
 createOrderForUser(1, [2])
