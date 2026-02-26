@@ -23,6 +23,7 @@ export const UserController: UserControllerContract = {
                         return
                     case "WRONG_CREDENTIALS":
                         res.status(401).json({message: 'wrong credentials'})
+                        return
                 }
             }   
             res.status(500).json({message: 'server error'})
@@ -98,7 +99,44 @@ export const UserController: UserControllerContract = {
     },
     createAddress: async(req, res) => {
         try {
-            const addressData = {...req.body, userId: res.locals.userId}
+            if (!req.body) {
+                res.status(400).json({message: "body is required"})
+                return
+            }
+            if (!req.body.city) {
+                res.status(400).json({message: 'city is required'})
+                return
+            }
+            if (!req.body.street) {
+                res.status(400).json({message: 'street is required'})
+                return
+            }
+            if (!req.body.houseNumber) {
+                res.status(400).json({message: 'houseNumber is required'})
+                return
+            }
+            if (isNaN(+req.body.houseNumber)) {
+                res.status(400).json({message: 'houseNumber must be a number'})
+                return
+            }
+            
+            if (!req.body.apartamentNumber) {
+                res.status(400).json({message: 'apartamentNumber is required'})
+                return
+            }
+            if (isNaN(+req.body.apartamentNumber)) {
+                res.status(400).json({message: 'apartamentNumber must be a number'})
+                return
+            }
+            if (!req.body.entranceNumber) {
+                res.status(400).json({message: 'entranceNumber is required'})
+                return
+            }
+            if (isNaN(+req.body.entranceNumber)) {
+                res.status(400).json({message: 'entranceNumber must be a number'})
+                return
+            }
+            const addressData = {...req.body, userId: res.locals.userId, houseNumber: +req.body.houseNumber, apartamentNumber: +req.body.apartamentNumber, entranceNumber: +req.body.entranceNumber}
             const address = await UserService.createAddress(addressData)
             res.status(200).json(address)
         } catch (error) {
