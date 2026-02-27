@@ -23,6 +23,7 @@ export interface ProductServiceContract {
 export interface ProductRepositoryContract {
     getAll: (categoryId?: number, take?: number, skip?: number) => Promise<Product[]>
     getById: (id: number) => Promise<ProductWithInfo | null>
+    getManyByIds: (ids: number[]) => Promise<Product[] | null>
     create: (data: CreateProduct) => Promise<Product>
     update: (id: number, data: UpdateProduct) => Promise<Product | null>
     delete: (id: number) => Promise<Product | null | string>
@@ -33,7 +34,7 @@ export interface ProductRepositoryContract {
 
 export interface ProductControllerContract {
     getAll: (req: Request<object, Product[] | string, object, {categoryId?: number, limit?: number, offset?: number}>, res: Response<Product[] | string | object>) => Promise<void>
-    getById: (req: Request<{id: string}, Product | string, object>, res: Response<ProductWithInfo | string | object | null>) => Promise<void>,
+    getById: (req: Request<{id: string}, ProductWithInfo | string, object>, res: Response<ProductWithInfo | string | object | null>) => Promise<void>,
     create: (req: Request<object, Product | string, CreateProduct, object>, res: Response<Product | string | object | null>) => Promise<void>
     update: (req: Request<{ id: string }, Product | string, UpdateProductChecked, object>, res: Response<Product | string | object>) => Promise<void>
     delete: (req: Request<{ id: string }, Product | string, object>, res: Response<Product | string | object>) => Promise<void>

@@ -46,7 +46,6 @@ model Order {
   firstName      String
   lastName       String
   patronymic     String
-  birthday       DateTime
   phoneNumber    String
   email          String
   address        Address?

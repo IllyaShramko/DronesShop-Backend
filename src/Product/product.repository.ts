@@ -4,6 +4,25 @@ import { PrismaClient as PC, Prisma } from "../generated/prisma";
 const PrismaClient = new PC()
 
 export const ProductRepository: ProductRepositoryContract = {
+    async getAll(categoryId, take, skip) {
+        if (categoryId){
+            const products = await PrismaClient.product.findMany({
+                where: {
+                    categoryId: categoryId
+                },
+                skip,
+                take
+            })
+            return products
+        }
+        else{
+            const products = await PrismaClient.product.findMany({
+                skip,
+                take
+            }) 
+            return products
+        }
+    },
     async getById(id) {
         try {
             const product = await PrismaClient.product.findUnique({
@@ -23,23 +42,19 @@ export const ProductRepository: ProductRepositoryContract = {
             throw error
         }
     },
-    async getAll(categoryId, take, skip) {
-        if (categoryId){
+    async getManyByIds(ids) {
+        try {
+            console.log(ids)
             const products = await PrismaClient.product.findMany({
                 where: {
-                    categoryId: categoryId
-                },
-                skip,
-                take
+                    id: {
+                        in: ids
+                    }
+                }
             })
             return products
-        }
-        else{
-            const products = await PrismaClient.product.findMany({
-                skip,
-                take
-            }) 
-            return products
+        } catch (error) {
+            return 
         }
     },
     async create(data) {
