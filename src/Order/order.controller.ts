@@ -86,8 +86,8 @@ export const OrderController: OrderControllerContract = {
             res.status(400).json({message: "city in deliveryData is required."})
             return
         }
-        if (!req.body.deliveryData.pickUpPoint) {
-            res.status(400).json({message: "pickUpPoint in deliveryData is required."})
+        if (!req.body.deliveryData.warehouse) {
+            res.status(400).json({message: "warehouse in deliveryData is required."})
             return
         }
         // 
@@ -133,9 +133,53 @@ export const OrderController: OrderControllerContract = {
             console.log(Error)
             return
         }
-        const order = await OrderService.makeOrder(req.body, res.locals.userId)
+
+        try {
+            const order = await OrderService.makeOrder(req.body, res.locals.userId)
+            res.status(200).json(order)
+        } catch (error) {
+            res.status(500).json({message: "Server Internal Error"})
+        }
         // 
-        res.status(200).json(order)
         return
     },
+    getCities: async (req, res) => {
+        if (!req.body.cityName) {
+            res.status(400).json({ message: "cityName is required" });
+            return;
+        }
+
+        if (req.body.cityName.length < 2) {
+            res.status(400).json({ message: "cityName is too short" });
+            return;
+        }
+
+        try {
+            const cities = await OrderService.getCities(req.body);
+            res.status(200).json(cities);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Error while fetching cities" });
+        }
+    },
+
+    getWarehouses: async (req, res) => {
+        if (!req.body.cityRef) {
+            res.status(400).json({ message: "cityRef is required" });
+            return;
+        }
+
+        if (!req.body.deliveryType) {
+            res.status(400).json({ message: "deliveryType is required" });
+            return;
+        }
+
+        try {
+            const warehouses = await OrderService.getWarehouses(req.body);
+            res.status(200).json(warehouses);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Error while fetching warehouses" });
+        }
+    }
 }

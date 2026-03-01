@@ -1,4 +1,3 @@
-import { promises } from "nodemailer/lib/xoauth2"
 import { Prisma } from "../generated/prisma"
 import { Request, Response } from 'express' 
 
@@ -9,8 +8,6 @@ export type OrderWithProducts = Prisma.OrderGetPayload<{include: {products: {inc
 export type ErrorResponse = {message: string}
 
 export type CreateOrder = Prisma.OrderCreateInput
-
-export type CreateAddressForOrder = Prisma.AddressCreateWithoutOrderInput
 
 export type MakeOrderCredentials = {
     userData: {
@@ -23,7 +20,8 @@ export type MakeOrderCredentials = {
     }
     deliveryData: {
         city: string
-        pickUpPoint: string
+        warehouse: string
+        street?: string
     }
     paymentData: {
         type: "pay_on_place" | "pay_now"
@@ -33,12 +31,40 @@ export type MakeOrderCredentials = {
         count: number
     }[]
 }
+export interface NPCity {
+    Ref: string;
+    Description: string;
+    AreaDescription: string;
+    SettlementTypeDescription: string;
+}
+
+export interface NPWarehouse {
+    Ref: string;
+    Description: string;
+    ShortAddress: string;
+    Number: string;
+    TypeOfWarehouse: string;
+    TotalMaxWeightAllowed: string;
+}
+
+export type GetCitiesCredentials = {
+    cityName: string;
+}
+
+export type GetWarehousesCredentials = {
+    cityRef: string;
+    deliveryType: 'warehouse' | 'postomat';
+}
+
+export const NP_URL = 'https://api.novaposhta.ua/v2.0/json/';
 
 export interface OrderServiceContract {
     getAll: () => Promise<Order[]>
     getById: (id: number) => Promise<Order | null>
     delete: (id: number) => Promise<Order | null | string>
     makeOrder: (credentials: MakeOrderCredentials, userId: number) => Promise<Order | null | ErrorResponse>
+    getCities: (credentials: GetCitiesCredentials) => Promise<NPCity[]>
+    getWarehouses: (credentials: GetWarehousesCredentials) => Promise<NPWarehouse[]>
 }
 
 export interface OrderRepositoryContract {
@@ -49,8 +75,7 @@ export interface OrderRepositoryContract {
     createOrder: (
         mainCredentials: CreateOrder,
         products: {id: number; count: number}[],
-        addressCredentials: CreateAddressForOrder,
-        userId: number
+        userId: number,
     ) => Promise<Order | ErrorResponse>
 }
 
@@ -61,5 +86,13 @@ export interface OrderControllerContract {
     makeOrder: (
         req: Request<object, Order | ErrorResponse, MakeOrderCredentials, object, {userId: number}>,
         res: Response<Order | ErrorResponse>
+    ) => Promise<void>
+    getCities: (
+        req: Request<object, NPCity[] | ErrorResponse, GetCitiesCredentials>, 
+        res: Response<NPCity[] | ErrorResponse>
+    ) => Promise<void>
+    getWarehouses: (
+        req: Request<object, NPWarehouse[] | ErrorResponse, GetWarehousesCredentials>, 
+        res: Response<NPWarehouse[] | ErrorResponse>
     ) => Promise<void>
 }

@@ -46,7 +46,11 @@ export interface UserControllerContract {
     getAdresses: (req: Request<object, ErrorResponse | Address[], object, object, {userId: number}>, res: Response<ErrorResponse | Address[], {userId: number}>) => Promise<void>,
     createAddress: (req: Request<object, ErrorResponse | Address, CreateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>,
     editAddress: (req: Request<{id: string}, ErrorResponse | Address, UpdateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>
-    getMyOrders: (req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>) => Promise<void>
+    
+    getMyOrders: (
+        req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, 
+        res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>
+    ) => Promise<void>
     
     startPasswordReset(request: Request<object, ErrorResponse | {message: string}, {email: string, url: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;
     verifyPasswordCode(request: Request<object, ErrorResponse | VerifyCodeResponse, {code: string}>, response: Response<ErrorResponse | VerifyCodeResponse>): Promise<void>;

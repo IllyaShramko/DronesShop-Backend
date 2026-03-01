@@ -32,7 +32,7 @@ export const OrderRepository: OrderRepositoryContract = {
     async delete(id) {
         return await PrismaClient.order.delete({where:{id}})
     },
-    async createOrder(mainCredentials, products, addressCredentials, userId) {
+    async createOrder(mainCredentials, products, userId) {
         try {
             return await PrismaClient.order.create({
                 data: {
@@ -45,13 +45,13 @@ export const OrderRepository: OrderRepositoryContract = {
                             }))
                         }
                     },
-                    address: { create: addressCredentials },
                     user: { connect: { id: userId }}
                 },
 
             })
         } catch (error) {
-            throw error
+            console.log(error)
+            return {message: "Error"}
         }
     },
 }

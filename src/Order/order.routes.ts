@@ -11,3 +11,7 @@ OrderRouter.get("/:id", OrderController.getById);
 OrderRouter.delete("/:id", OrderController.delete)
 
 OrderRouter.post("/", authMiddleware, OrderController.makeOrder)
+
+OrderRouter.post('/delivery/cities', OrderController.getCities);
+
+OrderRouter.post('/delivery/warehouses', OrderController.getWarehouses);
