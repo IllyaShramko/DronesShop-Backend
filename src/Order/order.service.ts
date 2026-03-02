@@ -14,8 +14,41 @@ export const OrderService: OrderServiceContract = {
     getById: async (id) => {
         return await OrderRepository.getById(id);
     },
-    async delete(id) {
-        return await OrderRepository.delete(id);
+    async cancel(id, userId) {
+        const order = await OrderRepository.getById(id);
+        if (!order) {
+            throw new Error("NOT_FOUND")
+        }
+        if (order.userId !== userId) {
+            throw new Error("FORBIDDEN")
+        }
+        try {
+            const response = await fetch(NP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    apiKey: ENV.NOVAPOSHTA_API_KEY,
+                    modelName: 'InternetDocument',
+                    calledMethod: 'delete',
+                    methodProperties: {
+                        DocumentRefs: [order.ref] 
+                    }
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                console.error("ERROR electronic consignment note:", result.errors);
+                throw new Error("ERROR_WHILE_DELETING")
+            }
+
+            const deletedOrder = await OrderRepository.cancel(id, userId);
+
+            return deletedOrder
+        } catch (error) {
+            console.log(error)
+            throw new Error("ERROR_WHILE_DELETING")
+        }
     },
     async makeOrder(credentials, userId) {
         const products = await ProductRepository.getManyByIds(credentials.productsToOrder.map(p => p.id))

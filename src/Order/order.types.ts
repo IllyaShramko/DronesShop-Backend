@@ -58,10 +58,11 @@ export type GetWarehousesCredentials = {
 
 export const NP_URL = 'https://api.novaposhta.ua/v2.0/json/';
 
+
 export interface OrderServiceContract {
     getAll: () => Promise<Order[]>
     getById: (id: number) => Promise<Order | null>
-    delete: (id: number) => Promise<Order | null | string>
+    cancel: (id: number, userId: number) => Promise<Order | ErrorResponse>
     makeOrder: (credentials: MakeOrderCredentials, userId: number) => Promise<Order | null | ErrorResponse>
     getCities: (credentials: GetCitiesCredentials) => Promise<NPCity[]>
     getWarehouses: (credentials: GetWarehousesCredentials) => Promise<NPWarehouse[]>
@@ -71,7 +72,7 @@ export interface OrderRepositoryContract {
     getAll: () => Promise<Order[]>
     getById: (id: number) => Promise<Order | null>
     getByIdUser: (userId: number) => Promise<OrderWithProducts[]>
-    delete: (id: number) => Promise<Order | null | string>
+    cancel: (id: number, userId: number) => Promise<Order>
     createOrder: (
         mainCredentials: CreateOrder,
         products: {id: number; count: number}[],
@@ -82,7 +83,7 @@ export interface OrderRepositoryContract {
 export interface OrderControllerContract {
     getAll: (req: Request<object, Order[] | string, object>, res: Response<Order[] | string | object>) => Promise<void>
     getById: (req: Request<{id: string}, Order | string, object>, res: Response<Order | string | object | null>) => void
-    delete: (req: Request<{id: string}, Order | string, object>, res: Response<Order | string | object>) => Promise<void>
+    cancel: (req: Request<{id: string}, Order | string, object>, res: Response<Order | string | object>) => Promise<void>
     makeOrder: (
         req: Request<object, Order | ErrorResponse, MakeOrderCredentials, object, {userId: number}>,
         res: Response<Order | ErrorResponse>

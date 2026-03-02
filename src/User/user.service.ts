@@ -6,6 +6,7 @@ import { StringValue } from 'ms'
 import { compare, genSalt, hash } from "bcryptjs"
 import { OrderRepository } from "../Order/order.repository" 
 import { transporter } from "../config/mail"
+import { NP_URL } from "../Order/order.types"
 
 const CODE_LENGTH = 10
 
@@ -66,7 +67,52 @@ export const UserService: UserServiceContract = {
     },
     async getMyOrders (userId){
         const orders = await OrderRepository.getByIdUser(userId)
-        return orders
+        
+        const trackingNumbers = orders.filter(o => o.trackingNumber).map(o => ({
+            DocumentNumber: o.trackingNumber,
+            Phone: "" 
+        }));
+
+        if (trackingNumbers.length === 0) return orders;
+
+        try {
+            const response = await fetch(NP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    apiKey: ENV.NOVAPOSHTA_API_KEY,
+                    modelName: 'TrackingDocument',
+                    calledMethod: 'getStatusDocuments',
+                    methodProperties: {
+                        Documents: trackingNumbers
+                    }
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.success) return orders;
+
+            return orders.map(order => {
+                const npInfo = result.data.find(d => d.Number === order.trackingNumber);
+                
+                if (!npInfo) return order;
+
+                return {
+                    ...order,
+                    deliveryStatus: {
+                        status: npInfo.Status,          
+                        statusCode: npInfo.StatusCode,  
+                        warehouse: npInfo.WarehouseRecipient,
+                        actualDeliveryDate: npInfo.ActualDeliveryDate,
+                        cost: npInfo.DocumentCost,
+                        payer: npInfo.PayerType
+                    }
+                };
+            });
+        } catch (error) {
+            console.error("Tracking enrichment failed:", error);
+            return orders;
+        }
     },
     async startPasswordReset(email, url) {
         const user = await UserRepository.findByEmail(email)

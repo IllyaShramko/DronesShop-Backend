@@ -19,7 +19,11 @@ export const OrderRepository: OrderRepositoryContract = {
                 where: {userId: userId},
                 include: {products: {
                     include: {product: true}
-                }}
+                }},
+                orderBy: [
+                    { isCanceled: 'asc' }, 
+                    { createdAt: 'desc' }
+                ],
             })
         } catch(error) {
             throw error
@@ -29,8 +33,13 @@ export const OrderRepository: OrderRepositoryContract = {
         const order = await PrismaClient.order.findMany({})
         return order
     },
-    async delete(id) {
-        return await PrismaClient.order.delete({where:{id}})
+    async cancel(id) {
+        return await PrismaClient.order.update({
+            where: { id },
+            data: { 
+                isCanceled: true
+            }
+        });
     },
     async createOrder(mainCredentials, products, userId) {
         try {

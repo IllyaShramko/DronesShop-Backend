@@ -4,6 +4,8 @@ import { OrderWithProducts } from "../Order/order.types"
 export type User = Prisma.UserGetPayload<{}>
 export type UserWithoutPassword = Prisma.UserGetPayload<{omit: {password: true}}>
 
+export type Order = Prisma.OrderGetPayload<{}>
+
 export type Address = Prisma.AddressGetPayload<{}>
 export type CreateAddress = Prisma.AddressUncheckedCreateInput
 export type UpdateAddress = Prisma.AddressUncheckedUpdateInput
@@ -38,6 +40,19 @@ export interface PasswordChangeResponse{
     success: boolean
 }
 
+export interface NPDeliveryStatus {
+    status: string;          
+    statusCode: string;      
+    warehouse: string;       
+    actualDeliveryDate: string; 
+    cost: string;       
+    payer: string;      
+}
+
+export interface OrderWithTrackingInfo extends OrderWithProducts {
+    deliveryStatus?: NPDeliveryStatus; 
+}
+
 export interface UserControllerContract {
     register: (req: Request<object, ErrorResponse | UserAuthResponse, UserCreate>, res: Response<ErrorResponse | UserAuthResponse>) => Promise<void>
     login: (req: Request<object, ErrorResponse | UserAuthResponse, LoginCredentials>, res: Response<ErrorResponse | UserAuthResponse>) => Promise<void>
@@ -48,8 +63,8 @@ export interface UserControllerContract {
     editAddress: (req: Request<{id: string}, ErrorResponse | Address, UpdateAddress, object, {userId: number}>, res: Response<ErrorResponse | Address, {userId: number}>) => Promise<void>
     
     getMyOrders: (
-        req: Request<object, ErrorResponse | OrderWithProducts[], object, object, {userId: number}>, 
-        res: Response<ErrorResponse | OrderWithProducts[], {userId: number}>
+        req: Request<object, ErrorResponse | OrderWithTrackingInfo[], object, object, {userId: number}>, 
+        res: Response<ErrorResponse | OrderWithTrackingInfo[], {userId: number}>
     ) => Promise<void>
     
     startPasswordReset(request: Request<object, ErrorResponse | {message: string}, {email: string, url: string}>, response: Response<ErrorResponse | {message: string}>): Promise<void>;

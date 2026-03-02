@@ -29,22 +29,35 @@ export const OrderController: OrderControllerContract = {
             res.json("Internal Error")
         }
     },
-    delete: async (req, res) => {
+    cancel: async (req, res) => {
         if (!req.params.id){    
-            res.status(400).json("id is required");
+            res.status(400).json({message: "id is required"});
             return
         }
         const id = +req.params.id
         if (isNaN(id)){
-            res.status(400).json("id must be an integer");
+            res.status(400).json({message: "id must be an integer"});
             return
         }
         try {
-            await OrderService.delete(id)
-            res.status(204).json("Deleted")
+            const order = await OrderService.cancel(id, res.locals.userId)
+            res.status(204).json({message: "DELETED"})
         }
         catch (error) {
-            res.json("Internal Error")
+            if (error instanceof Error) {
+                switch (error.message) {
+                    case "FORBIDDEN":
+                        res.status(403).json({message: "Access denied. You don't have permission to delete this order."})
+                        return
+                    case "ERROR_WHILE_DELETING":
+                        res.status(500).json({message: "Internal Server Error while deleting order. Try again later."})
+                        return
+                    case "NOT_FOUND":
+                        res.status(400).json({message: "Order by id not found."})
+                        return
+                }
+            }
+            res.status(500).json({message: "Internal Server Error"})
         }
     },
     makeOrder: async (req, res) => {

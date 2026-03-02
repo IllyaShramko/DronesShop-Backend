@@ -54,6 +54,9 @@ model Order {
   typePay        String
   trackingNumber String
   ref            String
+  isCanceled     Boolean          @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   products ProductOnOrder[]
 }
 
