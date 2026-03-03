@@ -96,13 +96,13 @@ export const UserService: UserServiceContract = {
                 const npInfo = result.data.find(d => d.Number === order.trackingNumber);
                 
                 if (!npInfo) return order;
-
                 return {
                     ...order,
                     deliveryStatus: {
-                        status: npInfo.Status,          
-                        statusCode: npInfo.StatusCode,  
-                        warehouse: npInfo.WarehouseRecipient,
+                        status: npInfo.Status,
+                        statusCode: npInfo.StatusCode,
+                        address: npInfo.WarehouseRecipient || npInfo.RecipientAddress,
+                        serviceType: npInfo.ServiceType, 
                         actualDeliveryDate: npInfo.ActualDeliveryDate,
                         cost: npInfo.DocumentCost,
                         payer: npInfo.PayerType

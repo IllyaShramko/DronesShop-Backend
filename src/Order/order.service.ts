@@ -95,6 +95,68 @@ export const OrderService: OrderServiceContract = {
         const contactRecipientRef = counterpartyResult.data[0].ContactPerson.data[0].Ref;
 
         const todayStr = new Date().toLocaleDateString('uk-UA', {day: '2-digit', month: '2-digit', year: 'numeric'}).replace(/\//g, '.'); 
+        let finalAddressRef = null;
+
+        if (!credentials.deliveryData.warehouse && credentials.deliveryData.street) {
+            const cleanAddress = credentials.deliveryData.street.trim();
+            const lastSpaceIndex = cleanAddress.lastIndexOf(" ");
+            
+            let streetName = cleanAddress;
+            let houseNumber = "1";
+
+            if (lastSpaceIndex !== -1) {
+                const potentialHouse = cleanAddress.slice(lastSpaceIndex + 1);
+                if (/[0-9]/.test(potentialHouse)) {
+                    streetName = cleanAddress.slice(0, lastSpaceIndex);
+                    houseNumber = potentialHouse;
+                }
+            }
+
+            const streetSearchResponse = await fetch(NP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    apiKey: ENV.NOVAPOSHTA_API_KEY,
+                    modelName: 'Address',
+                    calledMethod: 'getStreet',
+                    methodProperties: {
+                        CityRef: credentials.deliveryData.city,
+                        FindByString: streetName 
+                    }
+                })
+            });
+
+            const streetResult = await streetSearchResponse.json();
+
+            if (!streetResult.success || streetResult.data.length === 0) {
+                throw new Error("NO_ADDRESSES_FOUND");
+            }
+
+            const streetRef = streetResult.data[0].Ref;
+            const addressSaveResponse = await fetch(NP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    apiKey: ENV.NOVAPOSHTA_API_KEY,
+                    modelName: 'Address',
+                    calledMethod: 'save',
+                    methodProperties: {
+                        CounterpartyRef: recipientRef, 
+                        StreetRef: streetRef, 
+                        BuildingNumber: houseNumber, 
+                        Flat: "",
+                        Note: credentials.userData.wishes || "Подзвонити за годину"
+                    }
+                })
+            });
+
+            const addressResult = await addressSaveResponse.json();
+
+            if (!addressResult.success) {
+                console.error("Error:", addressResult.errors);
+                throw new Error("SERVER_INTERNAL_ERROR");
+            }
+
+            finalAddressRef = addressResult.data[0].Ref;
+        } 
 
         const orderResponse = await fetch(NP_URL, {
             method: 'POST',
@@ -111,22 +173,23 @@ export const OrderService: OrderServiceContract = {
                     Recipient: recipientRef,
                     ContactRecipient: contactRecipientRef,
                     CityRecipient: credentials.deliveryData.city, 
-                    RecipientAddress: credentials.deliveryData.warehouse, 
+                    RecipientAddress: credentials.deliveryData.warehouse || finalAddressRef, 
                     RecipientsPhone: credentials.userData.phoneNumber.trim(),
                     PayerType: "Recipient",
                     PaymentMethod: "Cash",
                     DateTime: todayStr, 
                     CargoType: "Parcel",
                     Weight: "1",
-                    ServiceType: "WarehouseWarehouse", 
+                    ServiceType: credentials.deliveryData.warehouse ? "WarehouseWarehouse" : "WarehouseDoors", 
                     SeatsAmount: "1",
                     Description: "Тестове замовлення",
                     Cost: discountPrice.toString(), 
                 }
             })
         });
-
+        
         const orderResult = await orderResponse.json();
+        console.log(orderResult)
         const mainCredentials: CreateOrder = {
             firstName: credentials.userData.firstName,
             lastName: credentials.userData.secondName,

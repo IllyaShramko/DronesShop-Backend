@@ -44,7 +44,9 @@ export interface NPDeliveryStatus {
     status: string;          
     statusCode: string;      
     warehouse: string;       
-    actualDeliveryDate: string; 
+    actualDeliveryDate: string;
+    serviceType: string; 
+    address: string;
     cost: string;       
     payer: string;      
 }

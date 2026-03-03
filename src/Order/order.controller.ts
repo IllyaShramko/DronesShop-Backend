@@ -99,10 +99,6 @@ export const OrderController: OrderControllerContract = {
             res.status(400).json({message: "city in deliveryData is required."})
             return
         }
-        if (!req.body.deliveryData.warehouse) {
-            res.status(400).json({message: "warehouse in deliveryData is required."})
-            return
-        }
         // 
         if (!req.body.paymentData) {
             res.status(400).json({message: "paymentData is required."})
